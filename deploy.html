@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LDC — Deploy Dashboard Publicly</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 20px;
+      padding: 36px;
+      max-width: 560px;
+      width: 100%;
+      box-shadow: 0 24px 48px rgba(0,0,0,0.4);
+    }
+    .logo-row { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+    .logo-badge {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: #6A1B9A; display: flex; align-items: center;
+      justify-content: center; font-weight: 800; font-size: 13px; color: white;
+    }
+    h1 { font-size: 22px; font-weight: 800; color: white; }
+    p.sub { font-size: 13px; color: #94a3b8; margin-top: 4px; }
+
+    .section { margin-top: 24px; }
+    .section-title {
+      font-size: 11px; font-weight: 700; color: #6A1B9A;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      margin-bottom: 12px;
+    }
+    label { font-size: 12px; color: #94a3b8; font-weight: 500; display: block; margin-bottom: 6px; }
+    input, select {
+      width: 100%; background: #0f172a; border: 1px solid #334155;
+      border-radius: 12px; padding: 11px 14px; font-size: 13px;
+      color: #e2e8f0; font-family: inherit; outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus, select:focus { border-color: #6A1B9A; }
+    input::placeholder { color: #475569; }
+
+    .btn {
+      width: 100%; padding: 13px;
+      border-radius: 12px; border: none;
+      font-size: 14px; font-weight: 700;
+      cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      margin-top: 16px;
+    }
+    .btn-primary { background: #6A1B9A; color: white; }
+    .btn-primary:hover { background: #4A148C; }
+    .btn-outline {
+      background: transparent; color: #94a3b8;
+      border: 1px solid #334155;
+    }
+    .btn-outline:hover { border-color: #6A1B9A; color: #e2e8f0; }
+
+    .result-box {
+      background: #0f172a; border: 1px solid #334155;
+      border-radius: 12px; padding: 16px;
+      font-size: 13px; margin-top: 16px;
+      display: none;
+    }
+    .result-box.show { display: block; }
+    .url-display {
+      background: #1e293b; border: 1px solid #6A1B9A33;
+      border-radius: 10px; padding: 12px 16px;
+      font-size: 15px; font-weight: 700; color: #c084fc;
+      word-break: break-all; margin: 10px 0;
+      cursor: pointer;
+    }
+    .url-display:hover { background: #2d1b69; }
+    .status-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      display: inline-block; margin-right: 6px;
+    }
+    .dot-green { background: #22c55e; }
+    .dot-yellow { background: #f59e0b; animation: pulse 1s infinite; }
+    .dot-red { background: #ef4444; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+    .info-box {
+      background: #1e293b; border-left: 3px solid #6A1B9A;
+      border-radius: 8px; padding: 12px 14px;
+      font-size: 12px; color: #94a3b8; margin-top: 12px;
+      line-height: 1.6;
+    }
+    .info-box a { color: #a78bfa; text-decoration: none; }
+    .info-box a:hover { text-decoration: underline; }
+    .steps { counter-reset: step; margin-top: 8px; }
+    .step {
+      counter-increment: step; padding: 8px 0 8px 32px;
+      position: relative; font-size: 12px; color: #94a3b8;
+      border-bottom: 1px solid #1e293b;
+    }
+    .step::before {
+      content: counter(step);
+      position: absolute; left: 0; top: 8px;
+      width: 20px; height: 20px; border-radius: 50%;
+      background: #6A1B9A; color: white;
+      font-size: 10px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .step:last-child { border-bottom: none; }
+    .badge {
+      display: inline-block; padding: 2px 8px; border-radius: 20px;
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+    }
+    .badge-free { background: #166534; color: #86efac; }
+    .badge-perm { background: #1e3a5f; color: #93c5fd; }
+    .badge-temp { background: #713f12; color: #fcd34d; }
+    .divider { border: none; border-top: 1px solid #334155; margin: 24px 0; }
+    .copy-btn {
+      background: #334155; border: none; color: #94a3b8;
+      padding: 6px 12px; border-radius: 8px; font-size: 11px;
+      cursor: pointer; font-family: inherit; font-weight: 600;
+    }
+    .copy-btn:hover { background: #475569; color: white; }
+  </style>
+</head>
+<body>
+<div class="card">
+  <div class="logo-row">
+    <div class="logo-badge">LDC</div>
+    <div>
+      <h1>Publish Dashboard Online</h1>
+      <p class="sub">Access from any device, any WiFi, any location</p>
+    </div>
+  </div>
+
+  <!-- OPTION 1: Netlify -->
+  <div class="section">
+    <div class="section-title">
+      Option 1 — Netlify Deploy <span class="badge badge-free">Free</span> <span class="badge badge-perm">Permanent</span>
+    </div>
+    <p style="font-size:12px;color:#94a3b8;margin-bottom:12px;">
+      Deploys your dashboard to a public HTTPS URL. Works from any device, any network, worldwide.
+    </p>
+
+    <div class="info-box steps">
+      <strong style="color:#e2e8f0;">One-time setup (2 minutes):</strong>
+      <div class="step">Go to <a href="https://app.netlify.com/signup" target="_blank">netlify.com</a> → Create a free account</div>
+      <div class="step">In Netlify → User Settings → Applications → Personal Access Tokens → <strong>New access token</strong></div>
+      <div class="step">Copy the token, paste below, click Deploy</div>
+    </div>
+
+    <div style="margin-top:14px;">
+      <label>Your Netlify Personal Access Token</label>
+      <input type="password" id="netlify-token" placeholder="nfp_xxxxxxxxxxxx..." autocomplete="off">
+    </div>
+
+    <div style="margin-top:10px;">
+      <label>Site Name (optional — leave blank for random name)</label>
+      <input type="text" id="netlify-sitename" placeholder="lakshmi-dental-care" autocomplete="off">
+    </div>
+
+    <button class="btn btn-primary" onclick="deployToNetlify()">
+      🚀 Deploy to Netlify
+    </button>
+
+    <div class="result-box" id="netlify-result">
+      <div id="netlify-status"></div>
+      <div class="url-display" id="netlify-url" onclick="copyURL('netlify-url')"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+        <span style="font-size:11px;color:#64748b;">Click URL to copy • Share with anyone</span>
+        <button class="copy-btn" onclick="copyURL('netlify-url')">Copy URL</button>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- OPTION 2: Cloudflare Tunnel -->
+  <div class="section">
+    <div class="section-title">
+      Option 2 — Cloudflare Quick Tunnel <span class="badge badge-free">Free</span> <span class="badge badge-temp">Temporary</span>
+    </div>
+    <p style="font-size:12px;color:#94a3b8;margin-bottom:12px;">
+      Creates a public HTTPS URL in seconds. No account needed. URL resets each time you restart.
+    </p>
+
+    <div class="info-box">
+      <strong style="color:#e2e8f0;">How it works:</strong><br>
+      Run <code style="color:#c084fc;">START-TUNNEL.bat</code> on your PC. It starts a local server and creates a public URL via Cloudflare. 
+      Share the URL with anyone — they can open the dashboard on any device anywhere.
+    </div>
+
+    <button class="btn btn-outline" onclick="openTunnelInstructions()">
+      📋 View Tunnel Instructions
+    </button>
+
+    <div class="result-box" id="tunnel-result">
+      <strong style="color:#e2e8f0;font-size:12px;">To start the tunnel:</strong>
+      <ol style="margin:10px 0 0 16px;font-size:12px;color:#94a3b8;line-height:2;">
+        <li>Double-click <code style="color:#c084fc;">START-TUNNEL.bat</code> in the LDC folder</li>
+        <li>A Cloudflare URL will appear in the terminal</li>
+        <li>Share that URL with anyone on any device</li>
+        <li>URL stays active while the window is open</li>
+      </ol>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- OPTION 3: Manual Netlify Drop -->
+  <div class="section">
+    <div class="section-title">
+      Option 3 — Manual Drag & Drop <span class="badge badge-free">Free</span> <span class="badge badge-perm">Permanent</span>
+    </div>
+    <div class="info-box steps">
+      <strong style="color:#e2e8f0;">Manual deploy (no token needed):</strong>
+      <div class="step">Go to <a href="https://app.netlify.com/drop" target="_blank">app.netlify.com/drop</a></div>
+      <div class="step">Drag the entire <code style="color:#c084fc;">lakshmi-dental-care</code> folder onto the page</div>
+      <div class="step">Netlify gives you a live public URL instantly</div>
+      <div class="step">Optional: Create a free account to keep the URL permanently</div>
+    </div>
+    <a href="https://app.netlify.com/drop" target="_blank">
+      <button class="btn btn-outline" style="margin-top:12px;">Open Netlify Drop ↗</button>
+    </a>
+  </div>
+</div>
+
+<script>
+  async function deployToNetlify() {
+    const token = document.getElementById('netlify-token').value.trim();
+    const siteName = document.getElementById('netlify-sitename').value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-');
+
+    if (!token) {
+      alert('Please enter your Netlify Personal Access Token.');
+      return;
+    }
+
+    const resultBox = document.getElementById('netlify-result');
+    const statusEl  = document.getElementById('netlify-status');
+    const urlEl     = document.getElementById('netlify-url');
+
+    resultBox.classList.add('show');
+    statusEl.innerHTML = '<span class="status-dot dot-yellow"></span> Creating Netlify site...';
+    urlEl.textContent  = '';
+
+    try {
+      // Step 1: Create site
+      const siteBody = siteName ? JSON.stringify({ name: siteName }) : '{}';
+      const siteResp = await fetch('https://api.netlify.com/api/v1/sites', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: siteBody
+      });
+
+      if (!siteResp.ok) {
+        const err = await siteResp.json();
+        throw new Error(err.message || 'Failed to create site');
+      }
+
+      const site = await siteResp.json();
+      statusEl.innerHTML = `<span class="status-dot dot-yellow"></span> Uploading dashboard files to <strong>${site.name}</strong>...`;
+
+      // Step 2: Fetch the index.html from same origin
+      const htmlResp = await fetch('./index.html');
+      const htmlText = await htmlResp.text();
+      const htmlBlob = new Blob([htmlText], { type: 'text/html' });
+
+      // Build FormData-like deploy using Files API
+      // Use the Files deploy method (SHA-based)
+      const encoder = new TextEncoder();
+      const htmlBytes = encoder.encode(htmlText);
+      const hashBuffer = await crypto.subtle.digest('SHA1', htmlBytes);
+      const hashArray  = Array.from(new Uint8Array(hashBuffer));
+      const sha1       = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+      // Create deploy with file hashes
+      const deployResp = await fetch(`https://api.netlify.com/api/v1/sites/${site.id}/deploys`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          files: { '/index.html': sha1 },
+          async: false
+        })
+      });
+
+      const deploy = await deployResp.json();
+
+      if (deploy.required && deploy.required.length > 0) {
+        // Upload the file
+        statusEl.innerHTML = '<span class="status-dot dot-yellow"></span> Uploading index.html...';
+        await fetch(`https://api.netlify.com/api/v1/deploys/${deploy.id}/files/index.html`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/octet-stream'
+          },
+          body: htmlBlob
+        });
+      }
+
+      // Poll for deploy ready
+      let attempts = 0;
+      let readyDeploy = deploy;
+      while (readyDeploy.state !== 'ready' && attempts < 20) {
+        await new Promise(r => setTimeout(r, 2000));
+        const pollResp = await fetch(`https://api.netlify.com/api/v1/deploys/${deploy.id}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        readyDeploy = await pollResp.json();
+        attempts++;
+        statusEl.innerHTML = `<span class="status-dot dot-yellow"></span> Deploying... (${readyDeploy.state})`;
+      }
+
+      const publicUrl = `https://${site.subdomain}.netlify.app`;
+      statusEl.innerHTML = '<span class="status-dot dot-green"></span> <strong style="color:#22c55e;">Deployed successfully!</strong>';
+      urlEl.textContent = publicUrl;
+
+      // Save to localStorage
+      localStorage.setItem('LDC_DEPLOY_URL', publicUrl);
+      localStorage.setItem('LDC_DEPLOY_TYPE', 'netlify');
+
+    } catch (err) {
+      statusEl.innerHTML = `<span class="status-dot dot-red"></span> Error: ${err.message}`;
+    }
+  }
+
+  function openTunnelInstructions() {
+    document.getElementById('tunnel-result').classList.add('show');
+  }
+
+  function copyURL(elId) {
+    const url = document.getElementById(elId).textContent.trim();
+    if (!url) return;
+    navigator.clipboard.writeText(url).then(() => {
+      const btn = document.querySelector('.copy-btn');
+      if (btn) { btn.textContent = 'Copied!'; setTimeout(() => { btn.textContent = 'Copy URL'; }, 2000); }
+    });
+  }
+
+  // Restore previous deploy URL if exists
+  window.onload = function() {
+    const saved = localStorage.getItem('LDC_DEPLOY_URL');
+    if (saved) {
+      document.getElementById('netlify-result').classList.add('show');
+      document.getElementById('netlify-status').innerHTML = '<span class="status-dot dot-green"></span> Previously deployed:';
+      document.getElementById('netlify-url').textContent = saved;
+    }
+  };
+</script>
+</body>
+</html>
