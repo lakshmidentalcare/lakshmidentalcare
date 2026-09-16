@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-[#FAF6FB] text-slate-800 antialiased;
+  }
+}
+
+/* Custom premium styles */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background-color: #FAF6FB;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: #DCB6EC;
+  border-radius: 9999px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background-color: #73308A;
+}
+
+/* Elite & Stylish CRM Accents */
+.elite-card {
+  background-color: #FFFFFF;
+  border: 1px solid rgba(115, 48, 138, 0.1);
+  box-shadow: 0 4px 20px -2px rgba(115, 48, 138, 0.04), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.elite-card:hover {
+  border-color: rgba(115, 48, 138, 0.25);
+  box-shadow: 0 10px 25px -3px rgba(115, 48, 138, 0.08), 0 4px 10px -2px rgba(0, 0, 0, 0.03);
+  transform: translateY(-1px);
+}
+
+.badge-elite {
+  background: linear-gradient(135deg, #F5EBF9 0%, #FAF6FB 100%);
+  color: #73308A;
+  border: 1px solid #DCB6EC;
+}
+
+/* FullCalendar Overrides */
+.fc-theme-standard .fc-scrollgrid {
+  @apply border-purple-100 rounded-xl overflow-hidden;
+}
+
+.fc-theme-standard td, .fc-theme-standard th {
+  @apply border-purple-50;
+}
+
+.fc-theme-standard .fc-col-header-cell {
+  @apply bg-[#FAF6FB] py-3 text-[#5D2471] font-semibold;
+}
+
+.fc-button-primary {
+  @apply bg-brand-600 border-none shadow-sm hover:bg-brand-700 hover:shadow-md transition-all focus:ring-2 focus:ring-brand-500 focus:outline-none !important;
+}
+
+.fc-button-active {
+  @apply bg-brand-800 !important;
+}
+
+.fc-event {
+  @apply rounded-md border-none px-2 py-1 shadow-sm;
+}
